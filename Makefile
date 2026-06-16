@@ -5,7 +5,7 @@ all:
 	npm install
 
 fmt:
-	npx prettier --write "**/*.{ts,tsx,css,scss,md}"
+	npx prettier --write "**/*.{ts,tsx,css,scss,md,yml,yaml,json}"
 	git add .
 	git commit -m "Format code" || echo "No changes to commit"
 
