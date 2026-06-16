@@ -5,6 +5,8 @@ services:
       - "11434:11434"
     volumes:
       - ollama:/root/.ollama
+    networks:
+      - ollama-net
     restart: unless-stopped
     # Uncomment for NVIDIA GPU support:
     # deploy:
@@ -23,10 +25,18 @@ services:
       - OLLAMA_BASE_URL=http://ollama:11434
     volumes:
       - open-webui:/app/backend/data
+    networks:
+      - ollama-net
     depends_on:
       - ollama
     restart: unless-stopped
 
+networks:
+  ollama-net:
+    driver: bridge
+
 volumes:
   ollama:
+    driver: local
   open-webui:
+    driver: local
