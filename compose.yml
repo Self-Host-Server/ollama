@@ -4,7 +4,7 @@ services:
     ports:
       - "11434:11434"
     volumes:
-      - ollama:/root/.ollama
+      - /mnt/nas-models/ollama:/root/.ollama
     networks:
       - ollama-net
     restart: unless-stopped
@@ -36,7 +36,5 @@ networks:
     driver: bridge
 
 volumes:
-  ollama:
-    driver: local
   open-webui:
     driver: local
