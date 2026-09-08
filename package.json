@@ -1,4 +1,6 @@
 {
+  "name": "ollama-config",
+  "private": true,
   "dependencies": {
     "prettier": "^3.8.4"
   },
