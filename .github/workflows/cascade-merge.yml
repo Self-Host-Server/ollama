@@ -21,6 +21,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_PAT || github.token }}
+          persist-credentials: false
 
       - name: Cascade merge into all branches
         env:

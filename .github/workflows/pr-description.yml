@@ -19,10 +19,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Gather PR context
         run: |
-          git log "origin/${{ github.base_ref }}...HEAD" --format="%s" --no-merges > /tmp/commits.txt || true
+          git log "origin/${GITHUB_BASE_REF}...HEAD" --format="%s" --no-merges > /tmp/commits.txt || true
 
           # Prefer the newest commit with a real conventional-commit type, since that
           # yields the most descriptive PR title. Without this, a generic subject line
@@ -39,18 +40,19 @@ jobs:
           # Last resort: newest commit, whatever it says.
           [ -s /tmp/first_subject.txt ] || head -1 /tmp/commits.txt > /tmp/first_subject.txt || true
 
-          git diff "origin/${{ github.base_ref }}...HEAD" --stat > /tmp/diff_stat.txt || true
-          git diff "origin/${{ github.base_ref }}...HEAD" | head -c 51200 > /tmp/diff.txt || true
+          git diff "origin/${GITHUB_BASE_REF}...HEAD" --stat > /tmp/diff_stat.txt || true
+          git diff "origin/${GITHUB_BASE_REF}...HEAD" | head -c 51200 > /tmp/diff.txt || true
 
       - name: Assign PR author and code owners
         env:
           GH_TOKEN: ${{ github.token }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
           python3 - <<'EOF'
           import subprocess, os, fnmatch
 
-          pr_author = "${{ github.event.pull_request.user.login }}"
-          base_ref = "origin/${{ github.base_ref }}"
+          pr_author = os.environ["PR_AUTHOR"]
+          base_ref = "origin/" + os.environ["GITHUB_BASE_REF"]
 
           changed = subprocess.run(
               ["git", "diff", f"{base_ref}...HEAD", "--name-only"],
@@ -107,10 +109,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           python3 - <<'EOF'
-          import subprocess, re
+          import subprocess, re, os
 
           pr_number = "${{ github.event.pull_request.number }}"
-          base_ref = "origin/${{ github.base_ref }}"
+          base_ref = "origin/" + os.environ["GITHUB_BASE_REF"]
 
           changed = subprocess.run(
               ["git", "diff", f"{base_ref}...HEAD", "--name-only"],
@@ -188,7 +190,7 @@ jobs:
         run: |
           CLIFF=$(.github/scripts/install_git_cliff.sh)
 
-          "$CLIFF" --config pyproject.toml "origin/${{ github.base_ref }}..HEAD" \
+          "$CLIFF" --config pyproject.toml "origin/${GITHUB_BASE_REF}..HEAD" \
             > /tmp/pr_body.txt 2>/tmp/cliff_err.txt
 
           # pyproject.toml's git-cliff config filters unconventional commits, so
