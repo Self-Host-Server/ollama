@@ -3,6 +3,10 @@ services:
     image: docker.io/ollama/ollama:latest
     ports:
       - "11434:11434"
+    environment:
+      - OLLAMA_MAX_LOADED_MODELS=2
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_CONTEXT_LENGTH=2048
     volumes:
       - /mnt/nas-models/ollama:/root/.ollama
     networks:
